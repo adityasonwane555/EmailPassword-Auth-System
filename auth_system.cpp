@@ -5,15 +5,25 @@
 
 using namespace std;
 
-// Fake Database
+// Fake DB
 unordered_map<string, string> userDB;
 
-// Hash function (replace with bcrypt in real systems)
+// Simple hash
 string hashPassword(const string &password) {
     return to_string(hash<string>{}(password));
 }
 
-// Signup Function
+// Fake JWT generator
+string generateToken(const string &email) {
+    return "TOKEN_" + email + "_SIGNED";
+}
+
+// Fake JWT verification
+bool verifyToken(const string &token) {
+    return token.find("TOKEN_") == 0 && token.find("_SIGNED") != string::npos;
+}
+
+// Signup
 void signup() {
     string email, password;
 
@@ -26,7 +36,7 @@ void signup() {
         return;
     }
 
-    cout << "Enter password (min 4 chars): ";
+    cout << "Enter password: ";
     cin >> password;
 
     if (password.length() < 4) {
@@ -34,14 +44,12 @@ void signup() {
         return;
     }
 
-    string hashed = hashPassword(password);
-    userDB[email] = hashed;
-
+    userDB[email] = hashPassword(password);
     cout << "Signup successful!\n";
 }
 
-// Login Function
-void login() {
+// Login
+string login() {
     string email, password;
 
     cout << "\n--- Login ---\n";
@@ -50,31 +58,45 @@ void login() {
 
     if (userDB.find(email) == userDB.end()) {
         cout << "User not found!\n";
-        return;
+        return "";
     }
 
     cout << "Enter password: ";
     cin >> password;
 
-    string hashed = hashPassword(password);
-
-    if (userDB[email] == hashed) {
+    if (userDB[email] == hashPassword(password)) {
+        string token = generateToken(email);
         cout << "Login successful!\n";
-        cout << "Token: FAKE_JWT_TOKEN\n";
+        cout << "Token: " << token << "\n";
+        return token;
     } else {
         cout << "Invalid password!\n";
+        return "";
     }
 }
 
-// Menu System
+// Protected route simulation
+void accessProtected(const string &token) {
+    cout << "\n--- Protected Resource ---\n";
+
+    if (verifyToken(token)) {
+        cout << "Access granted!\n";
+    } else {
+        cout << "Access denied! Invalid token\n";
+    }
+}
+
+// Menu
 void menu() {
     int choice;
+    string token = "";
 
     while (true) {
         cout << "\n====== AUTH SYSTEM ======\n";
         cout << "1. Signup\n";
         cout << "2. Login\n";
-        cout << "3. Exit\n";
+        cout << "3. Access Protected Resource\n";
+        cout << "4. Exit\n";
         cout << "Choose: ";
         cin >> choice;
 
@@ -83,9 +105,12 @@ void menu() {
                 signup();
                 break;
             case 2:
-                login();
+                token = login();
                 break;
             case 3:
+                accessProtected(token);
+                break;
+            case 4:
                 cout << "Exiting...\n";
                 return;
             default:
