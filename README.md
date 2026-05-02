@@ -21,7 +21,7 @@ This project is a simple authentication system built from scratch to understand 
 
 ## Project Structure
 
-
+```
 auth-api/
 │
 ├── node_modules/
@@ -29,7 +29,7 @@ auth-api/
 ├── package-lock.json
 ├── users.db
 └── index.js
-
+```
 
 ## Setup Instructions
 
